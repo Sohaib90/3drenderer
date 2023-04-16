@@ -39,21 +39,23 @@ void setup(void){
 
 void process_input(void){
     SDL_Event event;
-    SDL_PollEvent(&event);
 
-    switch (event.type)
-    {
-    case SDL_QUIT:
-        SDL_Log("Quit key was pressed. Exiting window.");
-        SDL_Quit();
-        is_running = false;        
-        break;
-    case SDL_KEYDOWN:
-        if (event.key.keysym.sym == SDLK_ESCAPE){
-            SDL_Log("Esc key was released. Exiting window.");
+    while(SDL_PollEvent(&event)){
+
+        switch (event.type)
+        {
+        case SDL_QUIT:
+            SDL_Log("Quit key was pressed. Exiting window.");
             SDL_Quit();
-            is_running = false;
+            is_running = false;        
             break;
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_ESCAPE){
+                SDL_Log("Esc key was released. Exiting window.");
+                SDL_Quit();
+                is_running = false;
+                break;
+            }
         }
     }
 }
@@ -82,5 +84,8 @@ int main(void) {
         render();
     }
 
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }
