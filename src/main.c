@@ -5,6 +5,10 @@
 bool is_running = false;
 SDL_Window *window = NULL;
 SDL_Renderer* renderer = NULL;
+SDL_Texture* texture = NULL;
+
+uint32_t* color_buffer = NULL;
+int window_width = 800, window_height = 600;
 
 bool initialize_window(void) { 
 
@@ -14,8 +18,7 @@ bool initialize_window(void) {
     }
 
     window = SDL_CreateWindow(
-        NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0
-    );
+        NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_BORDERLESS);
     if (!window) {
         SDL_Log("Error creating SDL window: %s", SDL_GetError());
         SDL_Quit();
@@ -34,7 +37,13 @@ bool initialize_window(void) {
 }
 
 void setup(void){
+    // allocate memory for color buffer
+    color_buffer = (uint32_t*) malloc(sizeof(color_buffer) * window_width * window_height);
+    if (!color_buffer) {
+       fprintf(stderr, "Error Allocating memory for color buffer");
+    }
 
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
 }
 
 void process_input(void){
@@ -64,11 +73,33 @@ void update(void){
 
 }
 
+void clear_color_buffer(uint32_t color){
+    for (int y = 0; y < window_height; y++){
+        for (int x = 0; x < window_width; x++){
+            color_buffer[(window_width* y) + x] = color;
+        }
+    }
+}
+
+void render_texture_copy(void){
+    SDL_UpdateTexture(texture, NULL, color_buffer, (int) (sizeof(uint32_t) * window_width));
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+}
+
 void render(void){
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    
+    clear_color_buffer(0xFFFFFF00);
+    render_texture_copy();
 
     SDL_RenderPresent(renderer);
+}
+
+void clean_up(void){
+    free(color_buffer);
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 
@@ -84,8 +115,6 @@ int main(void) {
         render();
     }
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    clean_up();
     return 0;
 }
