@@ -1,15 +1,22 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#define N_POINTS ( 9 * 9 * 9)
+
 typedef struct {
     float x;
     float y;
-} vect2_t;
+} vec2_t;
 
 typedef struct {
     float x;
     float y;
     float z;
-} vect3_t;
+} vec3_t;
+
+extern vec3_t cube_points[N_POINTS];
+extern vec2_t projected_points[N_POINTS];
+extern float fov_factor;
+vec2_t orthographic_projection(vec3_t point);
 
 #endif

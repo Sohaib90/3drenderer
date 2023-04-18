@@ -1,15 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h> // since we dont have native support for bool in c
 #include <SDL2/SDL.h>
-
 #include "display.h"
-
-SDL_Window *window = NULL;
-SDL_Renderer* renderer = NULL;
-SDL_Texture* texture = NULL;
-
-uint32_t* color_buffer = NULL;
-int window_width = 800, window_height = 600;
+#include "vector.h"
 
 bool is_running = false;
 
@@ -21,6 +14,16 @@ void setup(void){
     }
 
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
+
+    int point_count = 0;
+    for (float x = -1; x <= 1; x+= 0.25){
+        for (float y = -1; y <= 1; y+= 0.25){
+            for (float z = -1; z <= 1; z+= 0.25){
+                vec3_t point = {x, y, z};
+                cube_points[point_count++] = point;
+            }
+        }
+    }
 }
 
 void process_input(void){
@@ -47,13 +50,29 @@ void process_input(void){
 }
 
 void update(void){
+    for (int i = 0; i < N_POINTS; i++)
+    {
+        vec2_t projected_point = orthographic_projection(cube_points[i]);
+        projected_points[i] = projected_point;
+    }
+    
 }
 
 void render(void){
     
     draw_grid();
-    draw_rectangle(300, 200, 300, 150, 0xffff00ff);
-    render_texture();
+
+    for (int i = 0; i < N_POINTS; i++){
+        draw_rectangle(
+            projected_points[i].x + window_width / 2, 
+            projected_points[i].y + window_height / 2, 
+            4, 
+            4, 
+            0xffffff00
+        );
+    }
+
+    render_color_buffer();
     clear_color_buffer(0xFF000000);
 
     SDL_RenderPresent(renderer);
@@ -63,8 +82,8 @@ int main(void) {
 
     is_running = initialize_window();
 
-    // Game loop
     setup();
+    // Game loop
     while (is_running) {
         process_input();
         update();

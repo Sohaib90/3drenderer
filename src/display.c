@@ -1,5 +1,12 @@
 #include "display.h"
 
+SDL_Window *window = NULL;
+SDL_Renderer* renderer = NULL;
+SDL_Texture* texture = NULL;
+
+uint32_t* color_buffer = NULL;
+int window_width = 800, window_height = 600;
+
 bool initialize_window(void) { 
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -53,23 +60,21 @@ void draw_grid(void){
 }
 
 void draw_pixel(int x, int y, uint32_t color){
-    if (x < window_width && y < window_height) {
+    if (x >= 0 && x < window_width && y >= 0 && y < window_height) {
         color_buffer[y* window_width + x] = color;
     }
 }
 
 void draw_rectangle(int x, int y, int width, int height, uint32_t color){
-    if (x <= window_width && x >= 0 && y <= window_height && y >= 0 && width <= window_width && height <= window_height)
-    {   
-        for (int row = x; row < x + width; row++){
-            for (int col = y; col < y + height; col++){
-                color_buffer[col * window_width + row] = color;
-            }
+
+    for (int row = x; row < x + width; row++){
+        for (int col = y; col < y + height; col++){
+            draw_pixel(row, col, color);
         }
     }
 }
 
-void render_texture(void){
+void render_color_buffer(void){
     SDL_UpdateTexture(texture, NULL, color_buffer, (int) (sizeof(uint32_t) * window_width));
     SDL_RenderCopy(renderer, texture, NULL, NULL);
 }
