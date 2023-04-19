@@ -26,9 +26,7 @@ bool initialize_window(void) {
     
     window = SDL_CreateWindow(
         NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-        window_width, window_height, 
-        0
-    );
+        window_width, window_height, SDL_WINDOW_BORDERLESS || SDL_WINDOW_FULLSCREEN);
     if (!window) {
         SDL_Log("Error creating SDL window: %s", SDL_GetError());
         SDL_Quit();

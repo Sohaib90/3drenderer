@@ -52,7 +52,7 @@ void process_input(void){
 void update(void){
     for (int i = 0; i < N_POINTS; i++)
     {
-        vec2_t projected_point = orthographic_projection(cube_points[i]);
+        vec2_t projected_point = perspective_projection(cube_points[i]);
         projected_points[i] = projected_point;
     }
     
