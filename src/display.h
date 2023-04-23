@@ -5,6 +5,10 @@
 #include <stdbool.h> // since we dont have native support for bool in c
 #include <SDL2/SDL.h>
 
+#define FPS 30
+// how much time does each frame take?
+#define FRAME_TARGET_TIME (1000 / FPS)
+
 extern SDL_Window *window ;
 extern SDL_Renderer* renderer;
 extern SDL_Texture* texture;
