@@ -5,6 +5,7 @@
 #include "vector.h"
 
 bool is_running = false;
+uint32_t previous_frame_time = 0;
 
 void setup(void){
     // allocate memory for color buffer
@@ -50,9 +51,17 @@ void process_input(void){
 }
 
 void update(void){
-    cube_rotation.x += 0.005;
-    cube_rotation.y += 0.005;
-    cube_rotation.z += 0.005;
+
+    if (FRAME_TARGET_TIME >= SDL_GetTicks() - previous_frame_time){
+        SDL_Delay(FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time));
+    };
+
+    // how many ms have passed since the last frame
+    previous_frame_time = SDL_GetTicks();
+    
+    cube_rotation.x += 0.01;
+    cube_rotation.y += 0.01;
+    cube_rotation.z += 0.01;
 
     for (int i = 0; i < N_POINTS; i++)
     {
