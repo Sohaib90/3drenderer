@@ -4,7 +4,8 @@
 vec3_t cube_points[N_POINTS];
 vec2_t projected_points[N_POINTS];
 vec3_t camera_positon = {0.0f, 0.0f, -5.0f};
-float fov_factor = 640.0f; // used for scaling the projected points
+float fov_factor = 720.0f; // used for scaling the projected points
+vec3_t cube_rotation = {0.0f, 0.0f, 0.0f};
 
 vec2_t orthographic_projection(vec3_t point){
     vec2_t ortho_point = {.x = point.x * fov_factor, .y = point.y * fov_factor};
@@ -30,4 +31,31 @@ vec2_t perspective_projection(vec3_t point){
                 .y = (point.y / point.z) * fov_factor
             };
     return prespective_point;
+}
+
+vec3_t rotate_vector_x(vec3_t vector, float angle){
+    vec3_t rotated_vector = {
+               .x = vector.x,
+               .y = vector.y * cos(angle) - vector.z * sin(angle),
+               .z = vector.y * sin(angle) + vector.z * cos(angle)
+            };
+    return rotated_vector;
+}
+
+vec3_t rotate_vector_y(vec3_t vector, float angle){
+    vec3_t rotated_vector = {
+              .x = vector.x * cos(angle) - vector.z * sin(angle),
+              .y = vector.y,
+              .z  = vector.x * sin(angle) + vector.z * cos(angle)
+            };
+    return rotated_vector;
+}
+
+vec3_t rotate_vector_z(vec3_t vector, float angle){
+    vec3_t rotated_vector = {
+              .x = vector.x * cos(angle) - vector.y * sin(angle),
+              .y = vector.x * sin(angle) + vector.y * cos(angle),
+              .z = vector.z
+            };
+    return rotated_vector;
 }

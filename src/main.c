@@ -50,9 +50,16 @@ void process_input(void){
 }
 
 void update(void){
+    cube_rotation.x += 0.005;
+    cube_rotation.y += 0.005;
+    cube_rotation.z += 0.005;
+
     for (int i = 0; i < N_POINTS; i++)
     {
-        vec2_t projected_point = perspective_projection(cube_points[i]);
+        vec3_t rotated_points = rotate_vector_x(cube_points[i], cube_rotation.x);
+        rotated_points = rotate_vector_y(rotated_points, cube_rotation.y);
+        rotated_points = rotate_vector_z(rotated_points, cube_rotation.z);
+        vec2_t projected_point = perspective_projection(rotated_points);
         projected_points[i] = projected_point;
     }
     
