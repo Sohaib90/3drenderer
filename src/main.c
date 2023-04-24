@@ -3,7 +3,9 @@
 #include <SDL2/SDL.h>
 #include "display.h"
 #include "vector.h"
+#include "mesh.h"
 
+triangle_t triangle_to_render[N_MESH_FACES];
 bool is_running = false;
 uint32_t previous_frame_time = 0;
 
@@ -15,16 +17,10 @@ void setup(void){
     }
 
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
-
-    int point_count = 0;
-    for (float x = -1; x <= 1; x+= 0.25){
-        for (float y = -1; y <= 1; y+= 0.25){
-            for (float z = -1; z <= 1; z+= 0.25){
-                vec3_t point = {x, y, z};
-                cube_points[point_count++] = point;
-            }
-        }
+    if (!texture) {
+       fprintf(stderr, "Error creating texture");
     }
+
 }
 
 void process_input(void){
@@ -63,29 +59,39 @@ void update(void){
     cube_rotation.y += 0.01;
     cube_rotation.z += 0.01;
 
-    for (int i = 0; i < N_POINTS; i++)
-    {
-        vec3_t rotated_points = rotate_vector_x(cube_points[i], cube_rotation.x);
-        rotated_points = rotate_vector_y(rotated_points, cube_rotation.y);
-        rotated_points = rotate_vector_z(rotated_points, cube_rotation.z);
-        vec2_t projected_point = perspective_projection(rotated_points);
-        projected_points[i] = projected_point;
-    }
-    
+    for (int i = 0; i < N_MESH_FACES; i++){
+        vec3_t vertices[3];
+        vertices[0] = meshVertices[meshFaces[i].a - 1];
+        vertices[1] = meshVertices[meshFaces[i].b - 1];
+        vertices[2] = meshVertices[meshFaces[i].c - 1];
+
+        for (int j = 0; j < 3; j++){
+            vec3_t transformed_vertex = rotate_vector_x(vertices[j], cube_rotation.x);
+            transformed_vertex = rotate_vector_y(transformed_vertex, cube_rotation.y);
+            transformed_vertex = rotate_vector_z(transformed_vertex, cube_rotation.z);
+
+            // move the camera away
+            transformed_vertex.z -= camera_positon.z;
+            
+            // the triangle which needs to be projected 
+            triangle_to_render[i].points[j] = perspective_projection(transformed_vertex);
+
+            // translate the points to the center of the screen
+            triangle_to_render[i].points[j].x += window_width / 2;
+            triangle_to_render[i].points[j].y += window_height / 2;
+        }
+    }    
 }
 
 void render(void){
     
     draw_grid();
 
-    for (int i = 0; i < N_POINTS; i++){
-        draw_rectangle(
-            projected_points[i].x + window_width / 2, 
-            projected_points[i].y + window_height / 2, 
-            4, 
-            4, 
-            0xffffff00
-        );
+    for (int i = 0; i < N_MESH_FACES; i++){
+        triangle_t triangle = triangle_to_render[i];
+        draw_rectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xffffff00);
+        draw_rectangle(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xffffff00);
+        draw_rectangle(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xffffff00);
     }
 
     render_color_buffer();
