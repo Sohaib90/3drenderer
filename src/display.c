@@ -52,6 +52,30 @@ void clear_color_buffer(uint32_t color){
     }
 }
 
+void draw_line(int x1, int y1, int x2, int y2, uint32_t color) {
+    int delta_x = x2 - x1;
+    int delta_y = y2 - y1;
+
+    int side_length = (abs(delta_x) >= abs(delta_y)) ? abs(delta_x) : abs(delta_y);
+    float x_inc = delta_x / (float)side_length;
+    float y_inc = delta_y / (float)side_length;
+
+    float current_x = x1;
+    float current_y = y1;
+
+    for (int i = 0; i < side_length; i++){
+        draw_pixel(round(current_x), round(current_y), color);
+        current_x += x_inc;
+        current_y += y_inc;
+    }
+}
+
+void draw_triangle(triangle_t triangle, uint32_t color){
+    draw_line(triangle.points[0].x, triangle.points[0].y, triangle.points[1].x, triangle.points[1].y, color);
+    draw_line(triangle.points[1].x, triangle.points[1].y, triangle.points[2].x, triangle.points[2].y, color);
+    draw_line(triangle.points[2].x, triangle.points[2].y, triangle.points[0].x, triangle.points[0].y, color);
+}
+
 void draw_grid(void){
     for (int y = 0; y < window_height; y+=10) {
         for (int x = 0; x < window_width; x+=10) {
