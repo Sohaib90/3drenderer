@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdbool.h> // since we dont have native support for bool in c
 #include <SDL2/SDL.h>
+#include "dynamic_array/dynamic_array.h"
 #include "display.h"
 #include "vector.h"
 #include "mesh.h"
 
-triangle_t triangle_to_render[N_MESH_FACES];
+array_t triangle_to_render;
 bool is_running = false;
 uint32_t previous_frame_time = 0;
 
@@ -52,6 +53,8 @@ void update(void){
         SDL_Delay(FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time));
     };
 
+    triangle_to_render = array_create(1, ARR_TRIANGLE); 
+
     // how many ms have passed since the last frame
     previous_frame_time = SDL_GetTicks();
     
@@ -65,6 +68,8 @@ void update(void){
         vertices[1] = meshVertices[meshFaces[i].b - 1];
         vertices[2] = meshVertices[meshFaces[i].c - 1];
 
+        triangle_t projected_triangle;
+
         for (int j = 0; j < 3; j++){
             vec3_t transformed_vertex = rotate_vector_x(vertices[j], cube_rotation.x);
             transformed_vertex = rotate_vector_y(transformed_vertex, cube_rotation.y);
@@ -73,22 +78,22 @@ void update(void){
             // move the camera away
             transformed_vertex.z -= camera_positon.z;
             
-            // the triangle which needs to be projected 
-            triangle_to_render[i].points[j] = perspective_projection(transformed_vertex);
-
-            // translate the points to the center of the screen
-            triangle_to_render[i].points[j].x += window_width / 2;
-            triangle_to_render[i].points[j].y += window_height / 2;
+            // the triangle which needs to be projected
+            vec2_t projected_point = perspective_projection(transformed_vertex);
+            projected_point.x += window_width / 2;
+            projected_point.y += window_height /2 ;
+            projected_triangle.points[j] = projected_point; 
         }
+
+        array_push(&triangle_to_render, i, &projected_triangle);
     }    
 }
 
 void render(void){
     
     draw_grid();
-
-    for (int i = 0; i < N_MESH_FACES; i++){
-        triangle_t triangle = triangle_to_render[i];
+    for (size_t i = 0; i < triangle_to_render.occupied; i++){
+        triangle_t triangle = ((triangle_t*)triangle_to_render.data)[i];
 
         //draw vertices
         draw_rectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xffffff00);
@@ -98,6 +103,8 @@ void render(void){
         // draw triangle
         draw_triangle(triangle, 0xff0000ff);
     }
+
+    array_free(&triangle_to_render);
 
     render_color_buffer();
     clear_color_buffer(0xFF000000);
