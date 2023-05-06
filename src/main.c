@@ -22,6 +22,8 @@ void setup(void){
        fprintf(stderr, "Error creating texture");
     }
 
+    /* Load the cube values in the mesh data structure (mesh,h) */
+    load_cube_mesh_data();
 }
 
 void process_input(void){
@@ -58,22 +60,22 @@ void update(void){
     // how many ms have passed since the last frame
     previous_frame_time = SDL_GetTicks();
     
-    cube_rotation.x += 0.01;
-    cube_rotation.y += 0.01;
-    cube_rotation.z += 0.01;
+    mesh.mesh_rotation.x += 0.01;
+    mesh.mesh_rotation.y += 0.01;
+    mesh.mesh_rotation.z += 0.01;
 
-    for (int i = 0; i < N_MESH_FACES; i++){
+    for (int i = 0; i < mesh.faces.occupied; i++){
         vec3_t vertices[3];
-        vertices[0] = meshVertices[meshFaces[i].a - 1];
-        vertices[1] = meshVertices[meshFaces[i].b - 1];
-        vertices[2] = meshVertices[meshFaces[i].c - 1];
+        vertices[0] = ((vec3_t*)mesh.vertices.data)[((face_t*)mesh.faces.data)[i].a - 1];
+        vertices[1] = ((vec3_t*)mesh.vertices.data)[((face_t*)mesh.faces.data)[i].b - 1];
+        vertices[2] = ((vec3_t*)mesh.vertices.data)[((face_t*)mesh.faces.data)[i].c - 1];
 
         triangle_t projected_triangle;
 
         for (int j = 0; j < 3; j++){
-            vec3_t transformed_vertex = rotate_vector_x(vertices[j], cube_rotation.x);
-            transformed_vertex = rotate_vector_y(transformed_vertex, cube_rotation.y);
-            transformed_vertex = rotate_vector_z(transformed_vertex, cube_rotation.z);
+            vec3_t transformed_vertex = rotate_vector_x(vertices[j], mesh.mesh_rotation.x);
+            transformed_vertex = rotate_vector_y(transformed_vertex, mesh.mesh_rotation.y);
+            transformed_vertex = rotate_vector_z(transformed_vertex, mesh.mesh_rotation.z);
 
             // move the camera away
             transformed_vertex.z -= camera_positon.z;
@@ -112,6 +114,13 @@ void render(void){
     SDL_RenderPresent(renderer);
 }
 
+void free_mem_resources(void){
+    /* Free resources for dynamic arrays*/
+    free(color_buffer);
+    array_free(&mesh.faces);
+    array_free(&mesh.vertices);
+}
+
 int main(void) {
 
     is_running = initialize_window();
@@ -124,6 +133,7 @@ int main(void) {
         render();
     }
 
-    free_resources();
+    free_window_resources();
+    free_mem_resources();
     return 0;
 }

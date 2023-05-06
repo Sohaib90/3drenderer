@@ -26,6 +26,6 @@ void draw_triangle(triangle_t triangle, uint32_t color);
 void draw_line(int x1, int y1, int x2, int y2, uint32_t color);
 void clear_color_buffer(uint32_t color);
 void render_color_buffer();
-void free_resources(void);  
+void free_window_resources(void);  
 
 #endif

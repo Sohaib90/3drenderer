@@ -104,8 +104,7 @@ void render_color_buffer(void){
     SDL_RenderCopy(renderer, texture, NULL, NULL);
 }
 
-void free_resources(void){
-    free(color_buffer);
+void free_window_resources(void){
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
