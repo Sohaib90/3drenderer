@@ -63,6 +63,8 @@ void load_cube_mesh_data(void){
 
 bool load_obj_file(char *filename)
 {
+    // reference: http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
+
     init_mesh_data();
 
     FILE *f = fopen(filename, "r");
