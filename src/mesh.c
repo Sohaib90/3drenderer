@@ -60,3 +60,51 @@ void load_cube_mesh_data(void){
         array_push(&mesh.faces, i, &cubeFaces[i]);
     }
 }
+
+bool load_obj_file(char *filename)
+{
+    init_mesh_data();
+
+    FILE *f = fopen(filename, "r");
+    if (f == NULL){
+        printf("Error opening file %s\n", filename);
+        return false;
+    }
+
+    int vertex_index = 0;
+    int face_index = 0;
+    while(true){
+
+        char lineHeader[128];
+        int res = fscanf(f, "%s", lineHeader);
+        if (res == EOF) break;
+
+        if (strcmp(lineHeader, "v") == 0){
+            vec3_t vertex;
+            int matches = fscanf(f, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+            if (matches != 3){
+                printf("vertices can't be read by our simple parser : Try exporting with other options\n");
+                return false;
+            }
+            array_push(&mesh.vertices, vertex_index, &vertex);
+            vertex_index++;
+        } else if (strcmp(lineHeader, "f") == 0){
+            face_t face;
+            int uv[3] = {0, 0, 0};
+            int n[3] = {0, 0, 0};
+            int matches = fscanf(f, "%d/%d/%d %d/%d/%d %d/%d/%d\n", 
+                                    &face.a, &uv[0], &n[0], 
+                                    &face.b, &uv[1], &n[1], 
+                                    &face.c, &uv[2], &n[2]);
+            if (matches != 9){
+                printf("faces can't be read by our simple parser : Try exporting with other options\n");
+                return false;
+            }
+
+            array_push(&mesh.faces, face_index, &face);
+            face_index++;
+        }
+    }    
+
+    return true;
+}

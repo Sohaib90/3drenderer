@@ -1,6 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <stdbool.h>
+#include <string.h>
 #include "vector.h"
 #include "triangle.h"
 #include "dynamic_array/dynamic_array.h"
@@ -24,5 +26,6 @@ extern mesh_t mesh;
 
 void load_cube_mesh_data(void);
 void init_mesh_data(void);
+bool load_obj_file(char *filename);
 
 #endif
