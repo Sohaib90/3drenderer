@@ -22,11 +22,8 @@ void setup(void){
        fprintf(stderr, "Error creating texture");
     }
 
-    // /* Load the cube values in the mesh data structure (mesh.h) */
-    // load_cube_mesh_data();
-
     /* Load cube from obj file */
-    load_obj_file("models/f22.obj");
+    load_obj_file("models/crab.obj");
 }
 
 void process_input(void){
