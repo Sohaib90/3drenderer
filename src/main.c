@@ -26,7 +26,7 @@ void setup(void){
     // load_cube_mesh_data();
 
     /* Load cube from obj file */
-    load_obj_file("models/cube.obj");
+    load_obj_file("models/f22.obj");
 }
 
 void process_input(void){
@@ -101,12 +101,12 @@ void render(void){
         triangle_t triangle = ((triangle_t*)triangle_to_render.data)[i];
 
         //draw vertices
-        draw_rectangle(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xffffff00);
-        draw_rectangle(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xffffff00);
-        draw_rectangle(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xffffff00);
+        draw_rectangle(triangle.points[0].x, triangle.points[0].y, 1, 1, 0xffffff00);
+        draw_rectangle(triangle.points[1].x, triangle.points[1].y, 1, 1, 0xffffff00);
+        draw_rectangle(triangle.points[2].x, triangle.points[2].y, 1, 1, 0xffffff00);
 
         // draw triangle
-        draw_triangle(triangle, 0xff0000ff);
+        draw_triangle(triangle, 0xffffff00);
     }
 
     array_free(&triangle_to_render);
